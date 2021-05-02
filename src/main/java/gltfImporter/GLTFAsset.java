@@ -7,12 +7,11 @@ import gltfImporter.material.GLTFImage;
 import gltfImporter.material.GLTFMaterial;
 import gltfImporter.material.GLTFSampler;
 import gltfImporter.material.GLTFTexture;
+import gltfImporter.mesh.GLTFMesh;
 import jdk.jshell.spi.ExecutionControl;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,6 +30,7 @@ public class GLTFAsset {
     private final GLTFSampler[] samplers;
     private final GLTFTexture[] textures;
     private final GLTFMaterial[] materials;
+    private final GLTFMesh[] meshes;
 
     public GLTFAsset(File file) throws ExecutionControl.NotImplementedException, IOException, GLTFParseException {
         //Reading/Creating basic info
@@ -89,6 +89,12 @@ public class GLTFAsset {
             this.materials[i] = GLTFMaterial.fromJSONObject(jsonMaterials.getJSONObject(i), this.textures);
         }
 
+        //Creating the meshes
+        JSONArray jsonMeshes = jsonAsset.getJSONArray("meshes");
+        this.meshes = new GLTFMesh[jsonMeshes.length()];
+        for (int i = 0;i < jsonMeshes.length(); i++){
+            this.meshes[i] = GLTFMesh.fromJSONObject(jsonMeshes.getJSONObject(i), this.accessors, this.bufferViews, this.materials);
+        }
 
     }
 

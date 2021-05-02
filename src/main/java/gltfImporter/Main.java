@@ -29,19 +29,6 @@ public class Main {
 
         System.out.println("glb parsing took: " + milisGLB + " milliseconds");
         System.out.println("gltf parsing took: " + milisGLTF + " milliseconds");
-
-
-        URI testUri = getClass().getResource("/fox/gltf/Fox.gltf").toURI();
-        //System.out.println(testUri);
-        testUri = new URI(testUri.getPath() + "/");
-
-        URI parentURI = testUri.getPath().endsWith("/") ? testUri.resolve("..") : testUri.resolve(".");
-        //System.out.println(parentURI);
-
-        System.out.println(testUri);
-        System.out.println(testUri.resolve("."));
-        System.out.println(testUri.resolve(".."));
-        System.out.println(testUri.resolve("..."));
     }
 
     public static void main(String... arg) throws ExecutionControl.NotImplementedException, IOException, GLTFParseException, URISyntaxException {
