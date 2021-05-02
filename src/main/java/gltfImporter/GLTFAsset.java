@@ -31,6 +31,8 @@ public class GLTFAsset {
     private final GLTFTexture[] textures;
     private final GLTFMaterial[] materials;
     private final GLTFMesh[] meshes;
+    private final GLTFSkin[] skins;
+    private final GLTFNode[] nodes;
 
     public GLTFAsset(File file) throws ExecutionControl.NotImplementedException, IOException, GLTFParseException {
         //Reading/Creating basic info
@@ -96,6 +98,28 @@ public class GLTFAsset {
             this.meshes[i] = GLTFMesh.fromJSONObject(jsonMeshes.getJSONObject(i), this.accessors, this.bufferViews, this.materials);
         }
 
+        //Creating the skins
+        JSONArray jsonSkins = jsonAsset.getJSONArray("skins");
+        this.skins = new GLTFSkin[jsonSkins.length()];
+        for (int i = 0;i < jsonSamplers.length(); i++){
+            this.skins[i] = GLTFSkin.fromJSONObject(jsonSkins.getJSONObject(i), this.accessors);
+        }
+
+        //TODO implement camera - low priority
+        //Creating the nodes
+        JSONArray jsonNodes = jsonAsset.getJSONArray("nodes");
+        this.nodes = new GLTFNode[jsonNodes.length()];
+        for (int i = 0;i < jsonNodes.length(); i++){
+            this.nodes[i] = GLTFNode.fromJSONObject(jsonNodes.getJSONObject(i), this.meshes, this.skins);
+        }
+
+        //POST PROCESSING
+        for (GLTFSkin skin : this.skins){
+            skin.postFill_Nodes(this.nodes);
+        }
+        for (GLTFNode node : this.nodes){
+            node.postFill_nodes(this.nodes);
+        }
     }
 
     private JSONObject getJSON(File assetFile) throws IOException, GLTFParseException {
