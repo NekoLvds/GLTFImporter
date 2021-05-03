@@ -19,6 +19,25 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * The GLTFAsset class is a abstract representation of a GLTF asset.
+ *
+ * <p></p>
+ *
+ * It stores the objects contained by a gltf asset and holds the binary data in a more usable and structured way in memory.
+ *
+ * @see GLTFAccessor
+ * @see GLTFBuffer
+ * @see GLTFBufferView
+ * @see GLTFCamera
+ * @see GLTFImage
+ * @see GLTFMaterial
+ * @see GLTFMesh
+ * @see GLTFNode
+ * @see GLTFSampler
+ * @see GLTFSkin
+ * @see GLTFTexture
+ */
 public class GLTFAsset {
 
     private final File assetFile;
@@ -36,6 +55,18 @@ public class GLTFAsset {
     private final GLTFCamera[] cameras;
     private final GLTFNode[] nodes;
 
+    /**
+     * Constructs a new GLTF Asset from the given File.
+     * <p></p>
+     * That can either be a gltf (.gltf) or a bundled gltf (.glb). The Importer will do it's best to read the data from the file(s).
+     * <p></p>
+     * This Importer works in the sense of the <a href="https://github.com/KhronosGroup/glTF/tree/master/specification/2.0">specification</a> given
+     * by the Khronos Group. Version 2.0.
+     * @param file The File to be read.
+     * @throws ExecutionControl.NotImplementedException Should not occur. Will be removed in future update.
+     * @throws IOException If the File cannot be read. See the exception for further details.
+     * @throws GLTFParseException If the gltf file isn't as expected. See the exception message for more details.
+     */
     public GLTFAsset(File file) throws ExecutionControl.NotImplementedException, IOException, GLTFParseException {
         //Reading/Creating basic info
         this.assetFile = file;
@@ -134,6 +165,13 @@ public class GLTFAsset {
         }
     }
 
+    /**
+     * Reads the JSON from either the GLTF file or the GLB file.
+     * @param assetFile The asset file.
+     * @return The JSONObject containing the gltf json data.
+     * @throws IOException If the File cannot be read for some reason. See exception message for more details.
+     * @throws GLTFParseException If the File isn't as expected by GLTF Spec. See exception message for more details.
+     */
     private JSONObject getJSON(File assetFile) throws IOException, GLTFParseException {
         String mimeType = assetFile.getName().split("\\.")[1];
 

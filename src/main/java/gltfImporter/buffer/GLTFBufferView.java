@@ -5,9 +5,14 @@ import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.util.Arrays;
 
+/**
+ * The GLTFBufferView represents a buffer view. A buffer view is a subpart of a buffer and mostly represents a logically separate data part.
+ * <p></p>
+ *
+ * Using {@link #fromJSONObject(JSONObject, GLTFBuffer[])} to initialize the buffer view the data represented by this buffer view will be stored in memory.
+ */
 public class GLTFBufferView {
 
     private final GLTFBuffer buffer;
@@ -21,7 +26,7 @@ public class GLTFBufferView {
 
     private final byte[] data;
 
-    public GLTFBufferView(GLTFBuffer buffer, int byteOffset, int byteLength, int byteStride, int target, String name, JSONObject extensions, JSONObject extras) {
+    protected GLTFBufferView(GLTFBuffer buffer, int byteOffset, int byteLength, int byteStride, int target, String name, JSONObject extensions, JSONObject extras) {
         this.buffer = buffer;
         this.byteOffset = byteOffset;
         this.byteLength = byteLength;
@@ -101,6 +106,13 @@ public class GLTFBufferView {
         return result;
     }
 
+    /**
+     * Initialises a BufferView from a given {@link JSONObject} and the initialized list of {@link GLTFBuffer}.
+     * @param obj The JSON representing this BufferView in the assset.
+     * @param buffers The initialized list of Buffers.
+     * @return An initialized GLTFBufferView.
+     * @throws GLTFParseException If required fields aren't set. See exception message for further details.
+     */
     public static GLTFBufferView fromJSONObject(JSONObject obj, GLTFBuffer[] buffers) throws GLTFParseException {
         GLTFBuffer buffer = null;
         int byteOffset = -1;

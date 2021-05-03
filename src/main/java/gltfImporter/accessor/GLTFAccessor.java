@@ -8,6 +8,21 @@ import jdk.jshell.spi.ExecutionControl;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * The GLTFAccessor accesses data through a {@link GLTFBufferView} in a specific way. For example reading the data as three dimensional vectors
+ * to create the vertices or as 4x4 matrices to store a objects rotation, scale and translation.
+ *
+ * <p></p>
+ *
+ * This class abstract and only represents an accessor. The Implementations implement a data type to be read for example as float.
+ *
+ * <p></p>
+ *
+ * The {@link #fromJSONObject(JSONObject, GLTFBufferView[])} methode will create the correct type of accessor for you.
+ *
+ * @see GLTFFloatAccessor
+ * @see GLTFShortAccessor
+ */
 public abstract class GLTFAccessor {
 
     private final GLTFBufferView bufferView;
@@ -21,7 +36,7 @@ public abstract class GLTFAccessor {
     private final JSONObject extensions;
     private final JSONObject extras;
 
-    public GLTFAccessor(GLTFBufferView bufferView, int byteOffset, GLTFComponentType componentType, boolean normalized, int count, GLTFType type, JSONObject sparse, String name, JSONObject extensions, JSONObject extras) {
+    protected GLTFAccessor(GLTFBufferView bufferView, int byteOffset, GLTFComponentType componentType, boolean normalized, int count, GLTFType type, JSONObject sparse, String name, JSONObject extensions, JSONObject extras) {
         this.bufferView = bufferView;
         this.byteOffset = byteOffset;
         this.componentType = componentType;
@@ -74,6 +89,15 @@ public abstract class GLTFAccessor {
         return extras;
     }
 
+    /**
+     * Constructs a new GLTFAccessor using the given {@link JSONObject}. This methode will create the correct type
+     * of accessor like {@link GLTFFloatAccessor} or {@link GLTFShortAccessor} for you.
+     * @param obj The JSONObject of the Accessor.
+     * @param bufferViews The filled array of buffer views of the {@link gltfImporter.GLTFAsset} used to read the binary data from a {@link gltfImporter.buffer.GLTFBuffer};
+     * @return The constructed Accessor ready to use.
+     * @throws GLTFParseException If the JSON isn't properly filled. See exception message for details.
+     * @throws ExecutionControl.NotImplementedException Sparse encoding is not yet supported.
+     */
     public static GLTFAccessor fromJSONObject(JSONObject obj, GLTFBufferView[] bufferViews) throws GLTFParseException, ExecutionControl.NotImplementedException {
         GLTFBufferView bufferView = null;
         int byteOffset = 0;

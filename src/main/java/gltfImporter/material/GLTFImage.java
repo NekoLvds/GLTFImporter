@@ -10,6 +10,14 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * The GLTFImage class represents the image of a texture in the gltf and the binary data associated with it.
+ *
+ * <p></p>
+ *
+ * If {@link #fromJSONObject(JSONObject, GLTFBufferView[], File)} is used to initialize the image the actual image data
+ * is stored as {@link BufferedImage}.
+ */
 public class GLTFImage {
 
     private final String name;
@@ -25,6 +33,32 @@ public class GLTFImage {
         this.extras = extras;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public JSONObject getExtension() {
+        return extension;
+    }
+
+    public JSONObject getExtras() {
+        return extras;
+    }
+
+    public BufferedImage getBufferedImage() {
+        return bufferedImage;
+    }
+
+    /**
+     * Creates a GLTFImage based on the JSON object in the gltf asset and reads the binary data associated with it
+     * into a {@link BufferedImage}.
+     * @param obj The JSONObject representing this gltf image
+     * @param bufferViews The initialized buffer views
+     * @param parentDirectory The parent directory for relative uris
+     * @return The initialized gltf image.
+     * @throws GLTFParseException If the image has no binary data associated with it (no uri AND no buffer view).
+     * @throws IOException If image creation fails.
+     */
     public static GLTFImage fromJSONObject(JSONObject obj, GLTFBufferView[] bufferViews, File parentDirectory) throws GLTFParseException, IOException {
         String uri = "";
         String mimeType = "";

@@ -5,6 +5,9 @@ import gltfImporter.constants.GLTFMaterialAlphaMode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * GLTFMaterial represents a material defined in the gltf asset json and stores the associated binary data.
+ */
 public class GLTFMaterial {
 
     private final String name;
@@ -77,6 +80,13 @@ public class GLTFMaterial {
         return doubleSided;
     }
 
+    /**
+     * Initializes the gltf material from the json object.
+     * @param obj The Json object
+     * @param textures The initialized textures.
+     * @return The initialized material
+     * @throws GLTFParseException If the Json is malformed.
+     */
     public static GLTFMaterial fromJSONObject(JSONObject obj, GLTFTexture[] textures) throws GLTFParseException {
         String name = "";
         JSONObject extensions = null;

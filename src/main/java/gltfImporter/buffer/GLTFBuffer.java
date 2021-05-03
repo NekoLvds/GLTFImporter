@@ -8,6 +8,10 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+/**
+ * The GLTFBuffer represents binary data. The implementation reads the binary data from the given asset file when
+ * creating a GLTFBuffer using {@link #fromJSONObject(JSONObject, File)}
+ */
 public class GLTFBuffer {
 
     public static final int GLBmagic = 0x46546C67;
@@ -17,7 +21,7 @@ public class GLTFBuffer {
     private final JSONObject extensions;
     private final JSONObject extras;
 
-    public GLTFBuffer(byte[] data, String name, JSONObject extensions, JSONObject extras) {
+    protected GLTFBuffer(byte[] data, String name, JSONObject extensions, JSONObject extras) {
         this.data = data;
         this.name = name;
         this.extensions = extensions;
@@ -41,6 +45,18 @@ public class GLTFBuffer {
     }
 
     //TODO may convert little endian to big endian
+
+    /**
+     * Constructs a new Buffer from a {@link JSONObject}.
+     * <p></p>
+     * The binary data is automatically read from the disk file represented by File parameter.
+     * @param obj The {@link JSONObject}
+     * @param gltfFile The File representing the binary data on the disk
+     * @return A constructed GLTFBuffer with it's data read.
+     * @throws ExecutionControl.NotImplementedException If a  data URI is used to embed BASE64 Data. Not yet supported.
+     * @throws IOException If something went wrong reading the file. See exception message for more details.
+     * @throws GLTFParseException If something is wrong for example with the files format. See exception message for more details.
+     */
     public static GLTFBuffer fromJSONObject(JSONObject obj, File gltfFile) throws ExecutionControl.NotImplementedException, IOException, GLTFParseException {
         String name = "";
         byte[] data = null;
@@ -93,6 +109,12 @@ public class GLTFBuffer {
         return new GLTFBuffer(data, name, extensions, extras);
     }
 
+    /**
+     * Assistance methode for reading an unsigned 32bit little endian int.
+     * @param stream The input stream to read the uint32 from.
+     * @return A unsigned inr 32 (stored as long)
+     * @throws IOException See exception message for more details.
+     */
     public static long readUnsignedInt(InputStream stream) throws IOException {
         byte[] bytes = new byte[4];
         stream.read(bytes);

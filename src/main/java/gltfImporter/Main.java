@@ -1,12 +1,11 @@
 package gltfImporter;
 
+import gltfImporter.buffer.GLTFBuffer;
 import jdk.jshell.spi.ExecutionControl;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLConnection;
 import java.time.Duration;
 import java.time.Instant;
 
