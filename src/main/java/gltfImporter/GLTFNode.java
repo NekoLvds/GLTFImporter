@@ -1,12 +1,13 @@
 package gltfImporter;
 
+import gltfImporter.camera.GLTFCamera;
 import gltfImporter.mesh.GLTFMesh;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class GLTFNode {
 
-    //TODO add Camera
+    private final GLTFCamera camera;
     private GLTFNode[] children;
     private final int[] childIndices;
     private final GLTFSkin skin;
@@ -20,7 +21,8 @@ public class GLTFNode {
     private final JSONObject extensions;
     private final JSONObject extras;
 
-    public GLTFNode(int[] childIndices, GLTFSkin skin, float[] matrix, GLTFMesh mesh, float[] rotation, float[] scale, float[] translation, float[] weights, String name, JSONObject extensions, JSONObject extras) {
+    public GLTFNode(GLTFCamera camera, int[] childIndices, GLTFSkin skin, float[] matrix, GLTFMesh mesh, float[] rotation, float[] scale, float[] translation, float[] weights, String name, JSONObject extensions, JSONObject extras) {
+        this.camera = camera;
         this.childIndices = childIndices;
         this.skin = skin;
         this.matrix = matrix;
@@ -44,7 +46,8 @@ public class GLTFNode {
 
     }
 
-    public static GLTFNode fromJSONObject(JSONObject obj, GLTFMesh[] meshes, GLTFSkin[] skins){
+    public static GLTFNode fromJSONObject(JSONObject obj, GLTFCamera[] cameras, GLTFMesh[] meshes, GLTFSkin[] skins){
+        GLTFCamera camera = null;
         int[] children = null;
         GLTFSkin skin = null;
         float[] matrix = new float[]{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
@@ -57,6 +60,9 @@ public class GLTFNode {
         JSONObject extensions = null;
         JSONObject extras = null;
 
+        if (obj.has("camera")){
+            camera = cameras[obj.getInt("camera")];
+        }
         if (obj.has("children")){
             JSONArray array = obj.getJSONArray("children");
             children = new int[array.length()];
@@ -122,6 +128,7 @@ public class GLTFNode {
         }
 
         return new GLTFNode(
+                camera,
                 children,
                 skin,
                 matrix,

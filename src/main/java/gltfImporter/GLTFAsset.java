@@ -3,6 +3,7 @@ package gltfImporter;
 import gltfImporter.accessor.GLTFAccessor;
 import gltfImporter.buffer.GLTFBuffer;
 import gltfImporter.buffer.GLTFBufferView;
+import gltfImporter.camera.GLTFCamera;
 import gltfImporter.material.GLTFImage;
 import gltfImporter.material.GLTFMaterial;
 import gltfImporter.material.GLTFSampler;
@@ -32,6 +33,7 @@ public class GLTFAsset {
     private final GLTFMaterial[] materials;
     private final GLTFMesh[] meshes;
     private final GLTFSkin[] skins;
+    private final GLTFCamera[] cameras;
     private final GLTFNode[] nodes;
 
     public GLTFAsset(File file) throws ExecutionControl.NotImplementedException, IOException, GLTFParseException {
@@ -105,12 +107,22 @@ public class GLTFAsset {
             this.skins[i] = GLTFSkin.fromJSONObject(jsonSkins.getJSONObject(i), this.accessors);
         }
 
-        //TODO implement camera - low priority
+        //Creating the cameras
+        if (jsonAsset.has("cameras")){
+            JSONArray jsonCameras = jsonAsset.getJSONArray("cameras");
+            this.cameras = new GLTFCamera[jsonCameras.length()];
+            for (int i = 0;i < jsonCameras.length(); i++){
+                this.cameras[i] = GLTFCamera.fromJSONObject(jsonCameras.getJSONObject(i));
+            }
+        }else{
+            this.cameras = new GLTFCamera[]{};
+        }
+
         //Creating the nodes
         JSONArray jsonNodes = jsonAsset.getJSONArray("nodes");
         this.nodes = new GLTFNode[jsonNodes.length()];
         for (int i = 0;i < jsonNodes.length(); i++){
-            this.nodes[i] = GLTFNode.fromJSONObject(jsonNodes.getJSONObject(i), this.meshes, this.skins);
+            this.nodes[i] = GLTFNode.fromJSONObject(jsonNodes.getJSONObject(i), this.cameras, this.meshes, this.skins);
         }
 
         //POST PROCESSING
