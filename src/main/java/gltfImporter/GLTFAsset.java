@@ -1,6 +1,7 @@
 package gltfImporter;
 
 import gltfImporter.accessor.GLTFAccessor;
+import gltfImporter.animation.GLTFAnimation;
 import gltfImporter.buffer.GLTFBuffer;
 import gltfImporter.buffer.GLTFBufferView;
 import gltfImporter.camera.GLTFCamera;
@@ -54,6 +55,7 @@ public class GLTFAsset {
     private final GLTFSkin[] skins;
     private final GLTFCamera[] cameras;
     private final GLTFNode[] nodes;
+    private final GLTFAnimation[] animations;
 
     /**
      * Constructs a new GLTF Asset from the given File.
@@ -154,6 +156,13 @@ public class GLTFAsset {
         this.nodes = new GLTFNode[jsonNodes.length()];
         for (int i = 0;i < jsonNodes.length(); i++){
             this.nodes[i] = GLTFNode.fromJSONObject(jsonNodes.getJSONObject(i), this.cameras, this.meshes, this.skins);
+        }
+
+        //Creating the animations
+        JSONArray jsonAnimations = jsonAsset.getJSONArray("animations");
+        this.animations = new GLTFAnimation[jsonAnimations.length()];
+        for (int i = 0; i < jsonAnimations.length(); i++){
+            this.animations[i] = GLTFAnimation.fromJsonObject(jsonAnimations.getJSONObject(i), this.accessors, this.nodes);
         }
 
         //POST PROCESSING
