@@ -9,13 +9,15 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 
 /**
  * The GLTFImage class represents the image of a texture in the gltf and the binary data associated with it.
  *
  * <p></p>
  *
- * If {@link #fromJSONObject(JSONObject, GLTFBufferView[], File)} is used to initialize the image the actual image data
+ * If {@link #fromJSONObject(JSONObject, GLTFBufferView[], URI)} is used to initialize the image the actual image data
  * is stored as {@link BufferedImage}.
  */
 public class GLTFImage {
@@ -59,7 +61,7 @@ public class GLTFImage {
      * @throws GLTFParseException If the image has no binary data associated with it (no uri AND no buffer view).
      * @throws IOException If image creation fails.
      */
-    public static GLTFImage fromJSONObject(JSONObject obj, GLTFBufferView[] bufferViews, File parentDirectory) throws GLTFParseException, IOException {
+    public static GLTFImage fromJSONObject(JSONObject obj, GLTFBufferView[] bufferViews, URI parentDirectory) throws GLTFParseException, IOException {
         String uri = "";
         String mimeType = "";
         GLTFBufferView bufferView = null;
@@ -96,8 +98,8 @@ public class GLTFImage {
             byte[] imageData = bufferView.getData();
             image = ImageIO.read(new ByteArrayInputStream(imageData));
         } else{
-            String stringUri = parentDirectory + "\\" + uri;
-            image = ImageIO.read(new File(stringUri));
+            String stringUri = parentDirectory + uri;
+            image = ImageIO.read(new URL(stringUri));
         }
 
         if (image == null){

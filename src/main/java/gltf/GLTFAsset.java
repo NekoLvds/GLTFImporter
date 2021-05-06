@@ -14,10 +14,8 @@ import jdk.jshell.spi.ExecutionControl;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -41,8 +39,8 @@ import java.nio.charset.StandardCharsets;
  */
 public class GLTFAsset {
 
-    private final File assetFile;
-    private final File assetDirectory;
+    private final URI assetFile;
+    private final URI assetDirectory;
 
     private final GLTFBuffer[] buffers;
     private final GLTFBufferView[] bufferViews;
@@ -60,19 +58,19 @@ public class GLTFAsset {
     /**
      * Constructs a new GLTF Asset from the given File.
      * <p></p>
-     * That can either be a gltf (.gltf) or a bundled gltf (.glb). The Importer will do it's best to read the data from the file(s).
+     * That can either be a gltf (.gltf) or a bundled gltf (.glb). The Importer will do it's best to read the data from the uriFile(s).
      * <p></p>
      * This Importer works in the sense of the <a href="https://github.com/KhronosGroup/glTF/tree/master/specification/2.0">specification</a> given
      * by the Khronos Group. Version 2.0.
-     * @param file The File to be read.
+     * @param uriFile The File to be read.
      * @throws ExecutionControl.NotImplementedException Should not occur. Will be removed in future update.
      * @throws IOException If the File cannot be read. See the exception for further details.
-     * @throws GLTFParseException If the gltf file isn't as expected. See the exception message for more details.
+     * @throws GLTFParseException If the gltf uriFile isn't as expected. See the exception message for more details.
      */
-    public GLTFAsset(File file) throws ExecutionControl.NotImplementedException, IOException, GLTFParseException {
+    public GLTFAsset(URI uriFile) throws ExecutionControl.NotImplementedException, IOException, GLTFParseException {
         //Reading/Creating basic info
-        this.assetFile = file;
-        this.assetDirectory = file.getParentFile();
+        this.assetFile = uriFile;
+        this.assetDirectory = uriFile.getPath().endsWith("/") ? uriFile.resolve("..") : uriFile.resolve(".");;
 
         //Getting the Json
         JSONObject jsonAsset = getJSON(this.assetFile);
@@ -81,7 +79,7 @@ public class GLTFAsset {
         JSONArray jsonBuffers = jsonAsset.getJSONArray("buffers");
         this.buffers = new GLTFBuffer[jsonBuffers.length()];
         for (int i = 0;i < jsonBuffers.length(); i++){
-            this.buffers[i] = GLTFBuffer.fromJSONObject(jsonBuffers.getJSONObject(i), this.assetFile);
+            this.buffers[i] = GLTFBuffer.fromJSONObject(jsonBuffers.getJSONObject(i), this.assetFile, this.assetDirectory);
         }
 
         //Creating the buffer views
@@ -181,16 +179,17 @@ public class GLTFAsset {
      * @throws IOException If the File cannot be read for some reason. See exception message for more details.
      * @throws GLTFParseException If the File isn't as expected by GLTF Spec. See exception message for more details.
      */
-    private JSONObject getJSON(File assetFile) throws IOException, GLTFParseException {
-        String mimeType = assetFile.getName().split("\\.")[1];
+    private JSONObject getJSON(URI assetFile) throws IOException, GLTFParseException {
+        String fileName = assetFile.getPath().substring( assetFile.getPath().lastIndexOf('/')+1, assetFile.getPath().length() );
+        String mimeType = fileName.split("\\.")[1];
 
         if(mimeType.equals("gltf")){
-            FileInputStream inputStream = new FileInputStream(assetFile);
+            InputStream inputStream = assetFile.toURL().openStream();
             String json = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
             inputStream.close();
             return new JSONObject(json);
         }else if(mimeType.equals("glb")){
-            DataInputStream inputStream = new DataInputStream(new FileInputStream(assetFile));
+            DataInputStream inputStream = new DataInputStream(assetFile.toURL().openStream());
 
             long magic = GLTFBuffer.readUnsignedInt(inputStream);
             if(magic != GLTFBuffer.GLBmagic){

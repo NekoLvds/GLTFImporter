@@ -3,30 +3,46 @@ package gltf;
 import jdk.jshell.spi.ExecutionControl;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Main {
 
     public Main() throws ExecutionControl.NotImplementedException, IOException, GLTFParseException, URISyntaxException {
-        File glbAssetFile = new File(getClass().getResource("/fox/glb/Fox.glb").getFile());
-        File gltfAssetFile = new File(getClass().getResource("/fox/gltf/Fox.gltf").getFile());
+        File baseDirectory = new File(getClass().getResource("/testAssets").getFile());
+        File[] assetDirectories = baseDirectory.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isDirectory();
+            }
+        });
 
-        Instant glbStart = Instant.now();
-        GLTFAsset glbAsset = new GLTFAsset(glbAssetFile);
-        Instant glbEnd = Instant.now();
+        List<Duration> glbDurations = new LinkedList<>();
+        List<Duration> gltfDurations = new LinkedList<>();
 
-        Instant gltfStart = Instant.now();
-        GLTFAsset gltfAsset = new GLTFAsset(gltfAssetFile);
-        Instant gltfEnd = Instant.now();
+        for (File asset : assetDirectories){
+            File glbAssetFile = new File(asset + "/glb/" + asset.getName() + ".glb");
+            File gltfAssetFile = new File(asset + "/gltf/" + asset.getName() + ".gltf");
 
-        long milisGLB = Duration.between(glbStart, glbEnd).toMillis();
-        long milisGLTF = Duration.between(gltfStart, gltfEnd).toMillis();
+            Instant glbStart = Instant.now();
+            GLTFAsset glbAsset = new GLTFAsset(glbAssetFile.toURI());
+            Instant glbEnd = Instant.now();
 
-        System.out.println("glb parsing took: " + milisGLB + " milliseconds");
-        System.out.println("gltf parsing took: " + milisGLTF + " milliseconds");
+            Instant gltfStart = Instant.now();
+            GLTFAsset gltfAsset = new GLTFAsset(glbAssetFile.toURI());
+            Instant gltfEnd = Instant.now();
+
+            glbDurations.add(Duration.between(glbStart, glbEnd));
+            gltfDurations.add(Duration.between(gltfStart, gltfEnd));
+        }
+
+
     }
 
     public static void main(String... arg) throws ExecutionControl.NotImplementedException, IOException, GLTFParseException, URISyntaxException {

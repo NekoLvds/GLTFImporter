@@ -5,12 +5,13 @@ import jdk.jshell.spi.ExecutionControl;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
  * The GLTFBuffer represents binary data. The implementation reads the binary data from the given asset file when
- * creating a GLTFBuffer using {@link #fromJSONObject(JSONObject, File)}
+ * creating a GLTFBuffer using {@link #fromJSONObject(JSONObject, URI, URI)}
  */
 public class GLTFBuffer {
 
@@ -57,7 +58,7 @@ public class GLTFBuffer {
      * @throws IOException If something went wrong reading the file. See exception message for more details.
      * @throws GLTFParseException If something is wrong for example with the files format. See exception message for more details.
      */
-    public static GLTFBuffer fromJSONObject(JSONObject obj, File gltfFile) throws ExecutionControl.NotImplementedException, IOException, GLTFParseException {
+    public static GLTFBuffer fromJSONObject(JSONObject obj, URI gltfFile, URI parent) throws ExecutionControl.NotImplementedException, IOException, GLTFParseException {
         String name = "";
         byte[] data = null;
         JSONObject extensions = null;
@@ -70,7 +71,7 @@ public class GLTFBuffer {
         if (obj.has("uri")){
             //External data source
             String relUri = obj.getString("uri");
-            String baseURI = gltfFile.getParent();
+            String baseURI = parent.getPath();
 
             if(relUri.startsWith("data")){
                 //data URI
@@ -80,7 +81,7 @@ public class GLTFBuffer {
                 data = inputStream.readAllBytes();
             }
         }else{
-            DataInputStream inputStream = new DataInputStream(new FileInputStream(gltfFile));
+            DataInputStream inputStream = new DataInputStream(gltfFile.toURL().openStream());
 
             long magic = readUnsignedInt(inputStream);
             if (magic != GLBmagic){
