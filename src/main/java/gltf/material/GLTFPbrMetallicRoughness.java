@@ -72,7 +72,7 @@ public class GLTFPbrMetallicRoughness {
         JSONObject extras = null;
 
         if (obj.has("baseColorFactor")){
-            JSONArray factors = obj.getJSONArray("baseColorFactors");
+            JSONArray factors = obj.getJSONArray("baseColorFactor");
 
             if (factors.length() != 4){ //Length 4 is required by GLTF specification
                 throw new GLTFParseException("'baseColorFactor' must be a number array of length 4. Length: " + factors.length() + " indicates a corrupted file.");
@@ -92,7 +92,7 @@ public class GLTFPbrMetallicRoughness {
             roughnessFactor = obj.getBigDecimal("roughnessFactor").floatValue();
         }
         if (obj.has("metallicRoughnessTexture")){
-            metallicRoughnessTexture = GLTFTextureInfo.fromJSONObject(obj.getJSONObject("metallicroughnessTexture"), textures);
+            metallicRoughnessTexture = GLTFTextureInfo.fromJSONObject(obj.getJSONObject("metallicRoughnessTexture"), textures);
         }
         if (obj.has("extensions")){
             extensions = obj.getJSONObject("extensions");

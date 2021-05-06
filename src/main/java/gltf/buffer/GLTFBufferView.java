@@ -115,7 +115,7 @@ public class GLTFBufferView {
      */
     public static GLTFBufferView fromJSONObject(JSONObject obj, GLTFBuffer[] buffers) throws GLTFParseException {
         GLTFBuffer buffer = null;
-        int byteOffset = -1;
+        int byteOffset = 0;
         int byteLength = -1;
         int byteStride = -1;
         int target = -1;

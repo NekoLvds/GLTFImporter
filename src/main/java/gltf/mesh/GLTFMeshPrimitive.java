@@ -73,7 +73,7 @@ public class GLTFMeshPrimitive {
             throw new GLTFParseException("Field 'attributes' in 'mesh primitives' is required but not set.");
         }
         if (obj.has("indices")){
-            indices = GLTFAccessor.fromJSONObject(obj.getJSONObject("indices"), bufferViews);
+            indices = accessors[obj.getInt("indices")];
         }
         if (obj.has("material")){
             material = materials[obj.getInt("material")];

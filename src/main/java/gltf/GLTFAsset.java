@@ -97,31 +97,47 @@ public class GLTFAsset {
         }
 
         //Creating the Images
-        JSONArray jsonImages = jsonAsset.getJSONArray("images");
-        this.images = new GLTFImage[jsonImages.length()];
-        for (int i = 0;i < jsonImages.length(); i++){
-            this.images[i] = GLTFImage.fromJSONObject(jsonImages.getJSONObject(i), this.bufferViews, this.assetDirectory);
+        if (jsonAsset.has("images")){
+            JSONArray jsonImages = jsonAsset.getJSONArray("images");
+            this.images = new GLTFImage[jsonImages.length()];
+            for (int i = 0;i < jsonImages.length(); i++){
+                this.images[i] = GLTFImage.fromJSONObject(jsonImages.getJSONObject(i), this.bufferViews, this.assetDirectory);
+            }
+        } else {
+            this.images = new GLTFImage[0];
         }
 
         //Creating the samplers
-        JSONArray jsonSamplers = jsonAsset.getJSONArray("samplers");
-        this.samplers = new GLTFSampler[jsonSamplers.length()];
-        for (int i = 0;i < jsonSamplers.length(); i++){
-            this.samplers[i] = GLTFSampler.fromJSONObject(jsonSamplers.getJSONObject(i));
+        if (jsonAsset.has("samplers")){
+            JSONArray jsonSamplers = jsonAsset.getJSONArray("samplers");
+            this.samplers = new GLTFSampler[jsonSamplers.length()];
+            for (int i = 0;i < jsonSamplers.length(); i++){
+                this.samplers[i] = GLTFSampler.fromJSONObject(jsonSamplers.getJSONObject(i));
+            }
+        } else {
+            this.samplers = new GLTFSampler[0];
         }
 
         //Creating the textures
-        JSONArray jsonTextures = jsonAsset.getJSONArray("textures");
-        this.textures = new GLTFTexture[jsonTextures.length()];
-        for (int i = 0; i < jsonTextures.length(); i++){
-            this.textures[i] = GLTFTexture.fromJSONObject(jsonTextures.getJSONObject(i), this.images, this.samplers);
+        if (jsonAsset.has("textures")){
+            JSONArray jsonTextures = jsonAsset.getJSONArray("textures");
+            this.textures = new GLTFTexture[jsonTextures.length()];
+            for (int i = 0; i < jsonTextures.length(); i++){
+                this.textures[i] = GLTFTexture.fromJSONObject(jsonTextures.getJSONObject(i), this.images, this.samplers);
+            }
+        } else {
+            this.textures = new GLTFTexture[0];
         }
 
         //Creating the materials
-        JSONArray jsonMaterials = jsonAsset.getJSONArray("materials");
-        this.materials = new GLTFMaterial[jsonMaterials.length()];
-        for (int i = 0;i < jsonMaterials.length(); i++){
-            this.materials[i] = GLTFMaterial.fromJSONObject(jsonMaterials.getJSONObject(i), this.textures);
+        if (jsonAsset.has("materials")){
+            JSONArray jsonMaterials = jsonAsset.getJSONArray("materials");
+            this.materials = new GLTFMaterial[jsonMaterials.length()];
+            for (int i = 0;i < jsonMaterials.length(); i++){
+                this.materials[i] = GLTFMaterial.fromJSONObject(jsonMaterials.getJSONObject(i), this.textures);
+            }
+        }else {
+            this.materials = new GLTFMaterial[0];
         }
 
         //Creating the meshes
@@ -132,11 +148,16 @@ public class GLTFAsset {
         }
 
         //Creating the skins
-        JSONArray jsonSkins = jsonAsset.getJSONArray("skins");
-        this.skins = new GLTFSkin[jsonSkins.length()];
-        for (int i = 0;i < jsonSamplers.length(); i++){
-            this.skins[i] = GLTFSkin.fromJSONObject(jsonSkins.getJSONObject(i), this.accessors);
+        if (jsonAsset.has("skins")){
+            JSONArray jsonSkins = jsonAsset.getJSONArray("skins");
+            this.skins = new GLTFSkin[jsonSkins.length()];
+            for (int i = 0;i < jsonSkins.length(); i++){
+                this.skins[i] = GLTFSkin.fromJSONObject(jsonSkins.getJSONObject(i), this.accessors);
+            }
+        } else {
+            this.skins = new GLTFSkin[0];
         }
+
 
         //Creating the cameras
         if (jsonAsset.has("cameras")){
@@ -146,7 +167,7 @@ public class GLTFAsset {
                 this.cameras[i] = GLTFCamera.fromJSONObject(jsonCameras.getJSONObject(i));
             }
         }else{
-            this.cameras = new GLTFCamera[]{};
+            this.cameras = new GLTFCamera[0];
         }
 
         //Creating the nodes
@@ -157,11 +178,16 @@ public class GLTFAsset {
         }
 
         //Creating the animations
-        JSONArray jsonAnimations = jsonAsset.getJSONArray("animations");
-        this.animations = new GLTFAnimation[jsonAnimations.length()];
-        for (int i = 0; i < jsonAnimations.length(); i++){
-            this.animations[i] = GLTFAnimation.fromJsonObject(jsonAnimations.getJSONObject(i), this.accessors, this.nodes);
+        if (jsonAsset.has("animations")){
+            JSONArray jsonAnimations = jsonAsset.getJSONArray("animations");
+            this.animations = new GLTFAnimation[jsonAnimations.length()];
+            for (int i = 0; i < jsonAnimations.length(); i++){
+                this.animations[i] = GLTFAnimation.fromJsonObject(jsonAnimations.getJSONObject(i), this.accessors, this.nodes);
+            }
+        } else {
+            this.animations = new GLTFAnimation[0];
         }
+
 
         //POST PROCESSING
         for (GLTFSkin skin : this.skins){
