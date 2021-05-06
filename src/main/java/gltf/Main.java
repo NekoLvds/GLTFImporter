@@ -5,7 +5,6 @@ import jdk.jshell.spi.ExecutionControl;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.Instant;
@@ -13,8 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Main {
-
-    public Main() throws ExecutionControl.NotImplementedException, IOException, GLTFParseException, URISyntaxException {
+    public Main(){
         File baseDirectory = new File(getClass().getResource("/testAssets").getFile());
         File[] assetDirectories = baseDirectory.listFiles(new FileFilter() {
             @Override
@@ -30,19 +28,34 @@ public class Main {
             File glbAssetFile = new File(asset + "/glb/" + asset.getName() + ".glb");
             File gltfAssetFile = new File(asset + "/gltf/" + asset.getName() + ".gltf");
 
-            Instant glbStart = Instant.now();
-            GLTFAsset glbAsset = new GLTFAsset(glbAssetFile.toURI());
-            Instant glbEnd = Instant.now();
+            try{
+                Instant glbStart = Instant.now();
+                GLTFAsset glbAsset = new GLTFAsset(glbAssetFile.toURI());
+                Instant glbEnd = Instant.now();
 
-            Instant gltfStart = Instant.now();
-            GLTFAsset gltfAsset = new GLTFAsset(glbAssetFile.toURI());
-            Instant gltfEnd = Instant.now();
+                glbDurations.add(Duration.between(glbStart, glbEnd));
+            } catch (GLTFParseException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ExecutionControl.NotImplementedException e) {
+                e.printStackTrace();
+            }
 
-            glbDurations.add(Duration.between(glbStart, glbEnd));
-            gltfDurations.add(Duration.between(gltfStart, gltfEnd));
+            try{
+                Instant gltfStart = Instant.now();
+                GLTFAsset gltfAsset = new GLTFAsset(glbAssetFile.toURI());
+                Instant gltfEnd = Instant.now();
+
+                gltfDurations.add(Duration.between(gltfStart, gltfEnd));
+            } catch (GLTFParseException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ExecutionControl.NotImplementedException e) {
+                e.printStackTrace();
+            }
         }
-
-
     }
 
     public static void main(String... arg) throws ExecutionControl.NotImplementedException, IOException, GLTFParseException, URISyntaxException {
