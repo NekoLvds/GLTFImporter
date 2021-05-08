@@ -103,7 +103,6 @@ public class GLTFAccessor {
 
     public Number[] readData() throws GLTFParseException {
         Number[][] data = new Number[this.count][this.type.size()];
-//MEOW
         for (int index = 0; index < this.count; index++){
             data[index] = readType(index);
         }
