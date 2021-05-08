@@ -1,5 +1,6 @@
 package gltf;
 
+import gltf.accessor.GLTFAccessor;
 import jdk.jshell.spi.ExecutionControl;
 
 import java.io.File;
@@ -25,7 +26,6 @@ public class Main {
 
         List<Duration> glbDurations = new LinkedList<>();
         List<Duration> gltfDurations = new LinkedList<>();
-        List<GLTFAsset> assets = new LinkedList<>();
 
         List<String> gltfErrorMessages = new LinkedList<>();
 
@@ -40,8 +40,6 @@ public class Main {
                     Instant glbEnd = Instant.now();
 
                     glbDurations.add(Duration.between(glbStart, glbEnd));
-
-                    assets.add(glbAsset);
                 } catch (GLTFParseException e) {
                     gltfErrorMessages.add(e.getMessage());
                 } catch (IOException e) {
@@ -58,8 +56,6 @@ public class Main {
                     Instant gltfEnd = Instant.now();
 
                     gltfDurations.add(Duration.between(gltfStart, gltfEnd));
-
-                    assets.add(gltfAsset);
                 } catch (GLTFParseException e) {
                     gltfErrorMessages.add(e.getMessage());
                 } catch (IOException e) {

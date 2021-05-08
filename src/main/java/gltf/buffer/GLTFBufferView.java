@@ -75,37 +75,6 @@ public class GLTFBufferView {
         return extras;
     }
 
-    //TODO potential error source
-    public float[] getFloats(int byteOffset, int byteCount){
-        byte[] floatData = Arrays.copyOfRange(this.data, byteOffset, byteOffset + byteCount);
-        ByteBuffer buffer = ByteBuffer.wrap(floatData);
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
-
-        assert floatData.length % 4 == 0; //must be for floats
-
-        float[] result = new float[(int)(floatData.length / 4)];
-        for(int i = 0;i < result.length; i++){
-            result[i] = buffer.getFloat(i * 4);
-        }
-
-        return result;
-    }
-
-    //TODO potential error source
-    public int[] getUnsignedShorts(int byteOffset, int byteCount){
-        byte[] shortData = Arrays.copyOfRange(this.data, byteOffset, byteOffset + byteCount);
-        ByteBuffer buffer = ByteBuffer.wrap(shortData);
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
-
-        assert shortData.length % 2 == 0; //must be for shorts
-
-        int[] result = new int[(int)(shortData.length / 2)];
-        for(int i = 0;i < result.length; i++){
-            result[i] = buffer.getShort(i);
-        }
-        return result;
-    }
-
     /**
      * Initialises a BufferView from a given {@link JSONObject} and the initialized list of {@link GLTFBuffer}.
      * @param obj The JSON representing this BufferView in the assset.

@@ -1,5 +1,6 @@
 package gltf.accessor;
 
+import gltf.GLTFDataTypeException;
 import gltf.GLTFParseException;
 import gltf.buffer.GLTFBufferView;
 import gltf.constants.GLTFComponentType;
@@ -7,6 +8,11 @@ import gltf.constants.GLTFType;
 import jdk.jshell.spi.ExecutionControl;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Arrays;
 
 /**
  * The GLTFAccessor accesses data through a {@link GLTFBufferView} in a specific way. For example reading the data as three dimensional vectors
@@ -19,11 +25,8 @@ import org.json.JSONObject;
  * <p></p>
  *
  * The {@link #fromJSONObject(JSONObject, GLTFBufferView[])} methode will create the correct type of accessor for you.
- *
- * @see GLTFFloatAccessor
- * @see GLTFShortAccessor
  */
-public abstract class GLTFAccessor {
+public class GLTFAccessor {
 
     private final GLTFBufferView bufferView;
     private final int byteOffset;
@@ -32,11 +35,14 @@ public abstract class GLTFAccessor {
     private final int count;
     private final GLTFType type;
     private final JSONObject sparse;
+    private final float[] min;
+    private final float[] max;
     private final String name;
     private final JSONObject extensions;
     private final JSONObject extras;
+    private final byte[] data;
 
-    protected GLTFAccessor(GLTFBufferView bufferView, int byteOffset, GLTFComponentType componentType, boolean normalized, int count, GLTFType type, JSONObject sparse, String name, JSONObject extensions, JSONObject extras) {
+    protected GLTFAccessor(GLTFBufferView bufferView, int byteOffset, GLTFComponentType componentType, boolean normalized, int count, GLTFType type, JSONObject sparse, float[] min, float[] max, String name, JSONObject extensions, JSONObject extras) {
         this.bufferView = bufferView;
         this.byteOffset = byteOffset;
         this.componentType = componentType;
@@ -44,9 +50,15 @@ public abstract class GLTFAccessor {
         this.count = count;
         this.type = type;
         this.sparse = sparse;
+        this.min = min;
+        this.max = max;
         this.name = name;
         this.extensions = extensions;
         this.extras = extras;
+
+        int bytesPertype = this.type.size() * this.componentType.size();
+        int bytesTotal = bytesPertype * this.count;
+        this.data = Arrays.copyOfRange(this.getBufferView().getData(), this.getByteOffset(), bytesTotal + this.getByteOffset());
     }
 
     public GLTFBufferView getBufferView() {
@@ -89,9 +101,65 @@ public abstract class GLTFAccessor {
         return extras;
     }
 
+    public Number[] readData() throws GLTFParseException {
+        Number[][] data = new Number[this.count][this.type.size()];
+
+        for (int index = 0; index < this.count; index++){
+            data[index] = readType(index);
+        }
+
+        Number[] totalData = new Number[this.count * this.type.size()];
+
+        for (int index = 0; index < this.count; index++){
+
+            for (int component = 0; component < this.type.size(); component++){
+                totalData[index + component] = data[index][component];
+            }
+        }
+        return totalData;
+    }
+
+    private Number[] readType(int typeOffset) throws GLTFParseException {
+        Number[] component = new Number[this.type.size()];
+        int bytesPerType = this.componentType.size() * this.type.size();
+
+        for (int i = 0;i < component.length; i++){
+            int totalByteOffset = (bytesPerType * typeOffset) + (this.componentType.size() * i); //componentoffset + offset in component
+            component[i] = readComponentType(totalByteOffset);
+        }
+
+        return component;
+    }
+
+    private Number readComponentType(int byteOffset) throws GLTFParseException {
+        byte[] componentTypeBytes = Arrays.copyOfRange(this.data, byteOffset, byteOffset + this.componentType.size()); //read data e.g. for a float
+
+        ByteBuffer buffer = ByteBuffer.wrap(componentTypeBytes);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+        try{
+            switch (this.componentType) {
+                case UNSIGNED_BYTE:
+                    return Byte.toUnsignedInt(buffer.get());
+                case BYTE:
+                    return buffer.get();
+                case SHORT:
+                    return buffer.getShort();
+                case UNSIGNED_SHORT:
+                    return Short.toUnsignedInt(buffer.getShort());
+                case UNSIGNED_INT:
+                    return Integer.toUnsignedLong(buffer.getInt());
+                case FLOAT:
+                    return buffer.getFloat();
+                default:
+                    throw new GLTFParseException("The type: " + this.componentType + " is not supported.");
+            }
+        } catch (BufferUnderflowException e) {
+            throw new GLTFDataTypeException("Something went wrong when reading the data type." , e);
+        }
+    }
+
     /**
-     * Constructs a new GLTFAccessor using the given {@link JSONObject}. This methode will create the correct type
-     * of accessor like {@link GLTFFloatAccessor} or {@link GLTFShortAccessor} for you.
      * @param obj The JSONObject of the Accessor.
      * @param bufferViews The filled array of buffer views of the {@link gltf.GLTFAsset} used to read the binary data from a {@link gltf.buffer.GLTFBuffer};
      * @return The constructed Accessor ready to use.
@@ -109,6 +177,8 @@ public abstract class GLTFAccessor {
         String name = "";
         JSONObject extensions = null;
         JSONObject extras = null;
+        float[] min = null;
+        float[] max = null;
 
         if (obj.has("bufferView")){
             bufferView = bufferViews[obj.getInt("bufferView")];
@@ -150,80 +220,37 @@ public abstract class GLTFAccessor {
         if (obj.has("extras")){
             extras = obj.getJSONObject("extras");
         }
+        if (obj.has("min")){
+            JSONArray array = obj.getJSONArray("min");
+            min = new float[array.length()];
 
-        switch (componentType){
-            case FLOAT:
-                float[] min_floats = null;
-                float[] max_floats = null;
-
-                if (obj.has("min")){
-                    JSONArray jsonMinArray = obj.getJSONArray("min");
-
-                    min_floats = new float[jsonMinArray.length()];
-                    for(int i = 0;i < jsonMinArray.length(); i++){
-                        min_floats[i] = jsonMinArray.getBigDecimal(i).floatValue();
-                    }
-                }
-                if (obj.has("max")){
-                    JSONArray jsonMaxArray = obj.getJSONArray("max");
-
-                    max_floats = new float[jsonMaxArray.length()];
-                    for(int i = 0;i < jsonMaxArray.length(); i++){
-                        max_floats[i] = jsonMaxArray.getBigDecimal(i).floatValue();
-                    }
-                }
-                return new GLTFFloatAccessor(
-                        bufferView,
-                        byteOffset,
-                        componentType,
-                        normalized,
-                        count,
-                        type,
-                        sparse,
-                        name,
-                        extensions,
-                        extras,
-                        min_floats,
-                        max_floats
-                );
-
-            case UNSIGNED_SHORT:
-                short[] min_shorts = null;
-                short[] max_shorts = null;
-
-                if (obj.has("min")){
-                    JSONArray jsonMinArray = obj.getJSONArray("min");
-
-                    min_shorts = new short[jsonMinArray.length()];
-                    for(int i = 0;i < jsonMinArray.length(); i++){
-                        min_shorts[i] = jsonMinArray.getBigInteger(i).shortValue();
-                    }
-                }
-                if (obj.has("max")){
-                    JSONArray jsonMaxArray = obj.getJSONArray("max");
-
-                    max_shorts = new short[jsonMaxArray.length()];
-                    for(int i = 0;i < jsonMaxArray.length(); i++){
-                        max_shorts[i] = jsonMaxArray.getBigInteger(i).shortValue();
-                    }
-                }
-
-                return new GLTFShortAccessor(
-                        bufferView,
-                        byteOffset,
-                        componentType,
-                        normalized,
-                        count,
-                        type,
-                        sparse,
-                        name,
-                        extensions,
-                        extras,
-                        min_shorts,
-                        max_shorts
-                );
-            default: throw new GLTFParseException("Cannot parse type " + componentType.name() + ". Component type(s): BYTE, UNSIGNED_BYTE, SHORT, UNSIGNED_SHORT, UNSIGNED_INT are not yet supported.");
+            for (int i = 0;i < array.length(); i++){
+                min[i] = array.getBigDecimal(i).floatValue();
+            }
         }
+        if (obj.has("max")){
+            JSONArray array = obj.getJSONArray("max");
+            max = new float[array.length()];
+
+            for (int i = 0;i < array.length(); i++){
+                max[i] = array.getBigDecimal(i).floatValue();
+            }
+        }
+
+        return new GLTFAccessor(
+                bufferView,
+                byteOffset,
+                componentType,
+                normalized,
+                count,
+                type,
+                sparse,
+                min,
+                max,
+                name,
+                extensions,
+                extras
+        );
     }
 
     @Override

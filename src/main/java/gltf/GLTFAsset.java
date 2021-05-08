@@ -198,6 +198,62 @@ public class GLTFAsset {
         }
     }
 
+    public URI getAssetFile() {
+        return assetFile;
+    }
+
+    public URI getAssetDirectory() {
+        return assetDirectory;
+    }
+
+    public GLTFBuffer[] getBuffers() {
+        return buffers;
+    }
+
+    public GLTFBufferView[] getBufferViews() {
+        return bufferViews;
+    }
+
+    public GLTFAccessor[] getAccessors() {
+        return accessors;
+    }
+
+    public GLTFImage[] getImages() {
+        return images;
+    }
+
+    public GLTFSampler[] getSamplers() {
+        return samplers;
+    }
+
+    public GLTFTexture[] getTextures() {
+        return textures;
+    }
+
+    public GLTFMaterial[] getMaterials() {
+        return materials;
+    }
+
+    public GLTFMesh[] getMeshes() {
+        return meshes;
+    }
+
+    public GLTFSkin[] getSkins() {
+        return skins;
+    }
+
+    public GLTFCamera[] getCameras() {
+        return cameras;
+    }
+
+    public GLTFNode[] getNodes() {
+        return nodes;
+    }
+
+    public GLTFAnimation[] getAnimations() {
+        return animations;
+    }
+
     /**
      * Reads the JSON from either the GLTF file or the GLB file.
      * @param assetFile The asset file.
