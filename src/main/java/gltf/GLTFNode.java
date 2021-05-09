@@ -8,7 +8,7 @@ import org.json.JSONObject;
 public class GLTFNode {
 
     private final GLTFCamera camera;
-    private GLTFNode[] children;
+    private final GLTFNode[] children;
     private final int[] childIndices;
     private final GLTFSkin skin;
     private final float[] matrix;
@@ -34,11 +34,69 @@ public class GLTFNode {
         this.name = name;
         this.extensions = extensions;
         this.extras = extras;
+
+        if (this.childIndices != null){
+            this.children = new GLTFNode[this.childIndices.length];
+        } else {
+            this.children = new GLTFNode[0];
+        }
+
+    }
+
+    public GLTFCamera getCamera() {
+        return camera;
+    }
+
+    public GLTFNode[] getChildren() {
+        return children;
+    }
+
+    public int[] getChildIndices() {
+        return childIndices;
+    }
+
+    public GLTFSkin getSkin() {
+        return skin;
+    }
+
+    public float[] getMatrix() {
+        return matrix;
+    }
+
+    public GLTFMesh getMesh() {
+        return mesh;
+    }
+
+    public float[] getRotation() {
+        return rotation;
+    }
+
+    public float[] getScale() {
+        return scale;
+    }
+
+    public float[] getTranslation() {
+        return translation;
+    }
+
+    public float[] getWeights() {
+        return weights;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public JSONObject getExtensions() {
+        return extensions;
+    }
+
+    public JSONObject getExtras() {
+        return extras;
     }
 
     public void postFill_nodes(GLTFNode[] nodes){
         if (this.childIndices != null){
-            this.children = new GLTFNode[this.childIndices.length];
             for (int i = 0;i < this.children.length; i++){
                 this.children[i] = nodes[this.childIndices[i]];
             }

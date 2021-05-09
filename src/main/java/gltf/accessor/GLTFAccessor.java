@@ -101,7 +101,21 @@ public class GLTFAccessor {
         return extras;
     }
 
-    public Number[] readData() throws GLTFParseException {
+    public float[] readDataAsFloats() throws GLTFParseException {
+        return convert(readData());
+    }
+
+    private float[] convert(Number[] numbers){
+        float[] retArray = new float[numbers.length];
+
+        for (int i = 0;i < retArray.length; i++){
+            retArray[i] = numbers[i].floatValue();
+        }
+
+        return retArray;
+    }
+
+    private Number[] readData() throws GLTFParseException {
         Number[][] data = new Number[this.count][this.type.size()];
         for (int index = 0; index < this.count; index++){
             data[index] = readType(index);

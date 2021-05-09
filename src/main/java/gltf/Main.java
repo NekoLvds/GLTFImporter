@@ -39,6 +39,8 @@ public class Main {
                     GLTFAsset glbAsset = new GLTFAsset(glbAssetFile.toURI());
                     Instant glbEnd = Instant.now();
 
+                    System.out.println("Loaded: " + glbAssetFile);
+
                     glbDurations.add(Duration.between(glbStart, glbEnd));
                 } catch (GLTFParseException e) {
                     gltfErrorMessages.add(e.getMessage());
@@ -55,6 +57,8 @@ public class Main {
                     GLTFAsset gltfAsset = new GLTFAsset(gltfAssetFile.toURI());
                     Instant gltfEnd = Instant.now();
 
+                    System.out.println("Loaded: " + gltfAssetFile);
+                    
                     gltfDurations.add(Duration.between(gltfStart, gltfEnd));
                 } catch (GLTFParseException e) {
                     gltfErrorMessages.add(e.getMessage());
