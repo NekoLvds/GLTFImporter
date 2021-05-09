@@ -1,5 +1,5 @@
 # GLTFImporter
-This is a java importer for the gltf format.  
+This is a java importer for the gltf format into the JavaFX Framework.  
 The gltf format is a 3d format for storing assets or entire scenes
 and transfer them between applications.
 
