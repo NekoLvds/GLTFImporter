@@ -1,18 +1,19 @@
 package test;
 
-import fx.GLTFFXAsset;
+import fx.FXGLTFAsset;
+import fx.FXGLTFMesh;
 import gltf.GLTFAsset;
 import javafx.application.Application;
 import javafx.scene.Camera;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.shape.MeshView;
+import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.net.URI;
 
 public class MainApp extends Application {
 
@@ -21,9 +22,9 @@ public class MainApp extends Application {
         File file = new File(
                 "C:\\Users\\Lucas\\IdeaProjects\\GLTFImporter\\src\\main\\resources\\glTF-Sample-Models\\2.0\\Buggy\\glTF\\Buggy.gltf");
         GLTFAsset asset = new GLTFAsset(file.toURI());
-        GLTFFXAsset fxAsset = new GLTFFXAsset(asset);
+        FXGLTFAsset fxAsset = new FXGLTFAsset(asset);
 
-        Group root = fxAsset.getRoot();
+        Group root = test();
         Scene scene = new Scene(root);
         Camera camera = new PerspectiveCamera(true);
         camera.setFarClip(10000);
@@ -77,6 +78,31 @@ public class MainApp extends Application {
         primaryStage.setWidth(800);
 
         primaryStage.show();
+    }
+
+    private Group test(){
+        TriangleMesh mesh = new TriangleMesh();
+
+        mesh.getPoints().addAll(
+                -10f,   0f, -10f,
+                -10f,   0f,  10f,
+                 10f,   0f,  10f,
+                 10f,   0f, -10f,
+                 0f ,  10f,   0f
+        );
+
+        mesh.getFaces().addAll(
+                0, 0,  3, 0,  1, 0,
+                1, 0,  3, 0,  2, 0,
+                0, 0,  1, 0,  4, 0,
+                1, 0,  2, 0,  4, 0,
+                2, 0,  3, 0,  4, 0,
+                3, 0,  0, 0,  4, 0
+        );
+
+        MeshView view = new MeshView(mesh);
+
+        return new Group(view);
     }
 
 }

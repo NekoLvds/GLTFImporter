@@ -24,6 +24,8 @@ public class GLTFMesh {
         this.extras = extras;
     }
 
+
+
     public GLTFMeshPrimitive[] getPrimitives() {
         return primitives;
     }
