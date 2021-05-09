@@ -19,7 +19,7 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         File file = new File(
-                "C:\\Users\\Lucas\\IdeaProjects\\GLTFImporter\\src\\main\\resources\\glTF-Sample-Models\\2.0\\Fox\\glTF\\Fox.gltf");
+                "C:\\Users\\Lucas\\IdeaProjects\\GLTFImporter\\src\\main\\resources\\glTF-Sample-Models\\2.0\\Buggy\\glTF\\Buggy.gltf");
         GLTFAsset asset = new GLTFAsset(file.toURI());
         GLTFFXAsset fxAsset = new GLTFFXAsset(asset);
 

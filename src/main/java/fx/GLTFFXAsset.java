@@ -37,6 +37,10 @@ public class GLTFFXAsset {
             sphere.setTranslateY(trans[1]);
             sphere.setTranslateZ(trans[2]);
 
+            System.out.println("X: " + trans[0]);
+            System.out.println("Y: " + trans[1]);
+            System.out.println("Z: " + trans[2]);
+
             sphere.setRadius(1);
 
             PhongMaterial material = new PhongMaterial();

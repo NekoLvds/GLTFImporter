@@ -59,10 +59,6 @@ public class GLTFNode {
         return skin;
     }
 
-    public float[] getMatrix() {
-        return matrix;
-    }
-
     public GLTFMesh getMesh() {
         return mesh;
     }
@@ -139,34 +135,49 @@ public class GLTFNode {
             for (int i = 0; i < array.length(); i++){
                 matrix[i] = array.getBigDecimal(i).floatValue();
             }
+
+            translation = new float[]{matrix[4], matrix[8], matrix[12]};
+
+            float sx = (float) Math.sqrt(matrix[1] + matrix[5] + matrix[9]);
+            float sy = (float) Math.sqrt(matrix[2] + matrix[6] + matrix[10]);
+            float sz = (float) Math.sqrt(matrix[3] + matrix[7] + matrix[11]);
+
+            scale = new float[]{sx, sy, sz};
+
+            //TODO something is going wrong here.
+
+        } else {
+            if (obj.has("rotation")){
+                JSONArray array = obj.getJSONArray("rotation");
+                rotation = new float[array.length()];
+
+                for (int i = 0;i < array.length(); i++){
+                    rotation[i] = array.getBigDecimal(i).floatValue();
+                }
+            }
+
+            if (obj.has("scale")){
+                JSONArray array = obj.getJSONArray("scale");
+                scale = new float[array.length()];
+
+                for (int i = 0;i < array.length(); i++){
+                    scale[i] = array.getBigDecimal(i).floatValue();
+                }
+            }
+
+            if (obj.has("translation")){
+                JSONArray array = obj.getJSONArray("translation");
+                translation = new float[array.length()];
+
+                for (int i = 0; i < array.length(); i++){
+                    translation[i] = array.getBigDecimal(i).floatValue();
+                }
+            }
         }
         if (obj.has("mesh")){
             mesh = meshes[obj.getInt("mesh")];
         }
-        if (obj.has("rotation")){
-            JSONArray array = obj.getJSONArray("rotation");
-            rotation = new float[array.length()];
 
-            for (int i = 0;i < array.length(); i++){
-                rotation[i] = array.getBigDecimal(i).floatValue();
-            }
-        }
-        if (obj.has("scale")){
-            JSONArray array = obj.getJSONArray("scale");
-            scale = new float[array.length()];
-
-            for (int i = 0;i < array.length(); i++){
-                scale[i] = array.getBigDecimal(i).floatValue();
-            }
-        }
-        if (obj.has("translation")){
-            JSONArray array = obj.getJSONArray("translation");
-            translation = new float[array.length()];
-
-            for (int i = 0; i < array.length(); i++){
-                translation[i] = array.getBigDecimal(i).floatValue();
-            }
-        }
         if (obj.has("weights")){
             JSONArray array = obj.getJSONArray("weights");
             weights = new float[array.length()];
