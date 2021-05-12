@@ -11,6 +11,10 @@ Although there are many projects on the internet many are abandoned
 by there creators and are two+ years since there last update ignoring
 that many were never finished / aren't working at all.
 
+##Important note
+This importer is WIP. The Object structure in the entire gltf package is not 
+yet correctly done and not the most efficient or future proof.  
+**This will be addressed before Version 1**
 ## Goals
 The goal is to have an easy to use all round solution for importing
 gltf files into JavaFX.  
