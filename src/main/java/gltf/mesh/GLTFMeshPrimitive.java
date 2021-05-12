@@ -9,6 +9,8 @@ import jdk.jshell.spi.ExecutionControl;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Arrays;
+
 public class GLTFMeshPrimitive {
 
     private final GLTFMeshPrimitiveAttribute attribute;
@@ -67,7 +69,7 @@ public class GLTFMeshPrimitive {
         JSONObject extras = null;
 
         if (obj.has("attributes")){
-            GLTFMeshPrimitiveAttribute.fromJSONObject(obj.getJSONObject("attributes"), accessors);
+            attributes = GLTFMeshPrimitiveAttribute.fromJSONObject(obj.getJSONObject("attributes"), accessors);
         } else{
             //required field
             throw new GLTFParseException("Field 'attributes' in 'mesh primitives' is required but not set.");
@@ -105,5 +107,18 @@ public class GLTFMeshPrimitive {
                 extensions,
                 extras
         );
+    }
+
+    @Override
+    public String toString() {
+        return "GLTFMeshPrimitive{" +
+                "attribute=" + attribute +
+                ", indices=" + indices +
+                ", material=" + material +
+                ", mode=" + mode +
+                ", targets=" + Arrays.toString(targets) +
+                ", extensions=" + extensions +
+                ", extras=" + extras +
+                '}';
     }
 }

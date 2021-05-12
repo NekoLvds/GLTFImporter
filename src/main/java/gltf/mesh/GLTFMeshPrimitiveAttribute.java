@@ -135,4 +135,18 @@ public class GLTFMeshPrimitiveAttribute {
                 weights_0
         );
     }
+
+    @Override
+    public String toString() {
+        return "GLTFMeshPrimitiveAttribute{" +
+                "position=" + position +
+                ", normal=" + normal +
+                ", tangent=" + tangent +
+                ", texCoord_0=" + texCoord_0 +
+                ", texcoord_1=" + texcoord_1 +
+                ", color_0=" + color_0 +
+                ", joints_0=" + joints_0 +
+                ", weights_0=" + weights_0 +
+                '}';
+    }
 }

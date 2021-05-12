@@ -9,10 +9,15 @@ import jdk.jshell.spi.ExecutionControl;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.sound.sampled.LineEvent;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 /**
  * The GLTFAccessor accesses data through a {@link GLTFBufferView} in a specific way. For example reading the data as three dimensional vectors
@@ -56,9 +61,9 @@ public class GLTFAccessor {
         this.extensions = extensions;
         this.extras = extras;
 
-        int bytesPertype = this.type.size() * this.componentType.size();
-        int bytesTotal = bytesPertype * this.count;
-        this.data = Arrays.copyOfRange(this.getBufferView().getData(), this.getByteOffset(), bytesTotal + this.getByteOffset());
+        int bytesPerType = this.type.size() * this.componentType.size();
+        int bytesTotal = bytesPerType * this.count;
+        this.data = Arrays.copyOfRange(this.getBufferView().getData(), this.getByteOffset(), this.getByteOffset() + bytesTotal);
     }
 
     public GLTFBufferView getBufferView() {
@@ -116,39 +121,61 @@ public class GLTFAccessor {
     }
 
     private Number[] readData() throws GLTFParseException {
-        Number[][] data = new Number[this.count][this.type.size()];
-        for (int index = 0; index < this.count; index++){
-            data[index] = readType(index);
+        int bytesPertype = this.type.size() * this.componentType.size();
+        int bytesTotal = bytesPertype * this.count;
+        //System.out.println("TotalBytes: " + bytesTotal);
+        //System.out.println("Type size: " + this.type.size());
+        //System.out.println("Comp Size: " + this.componentType.size());
+
+        Number[][] dataRaw = new Number[this.count][];
+
+        for (int typeIndex = 0;typeIndex < this.count; typeIndex++){
+            dataRaw[typeIndex] = readType(typeIndex);
         }
 
-        Number[] totalData = new Number[this.count * this.type.size()];
+        Number[] simplified =  simplify(dataRaw);
+        return simplified;
+    }
 
-        for (int index = 0; index < this.count; index++){
+    private Number[] simplify (Number[][] complicatedArray){
+        List<Number> list = new LinkedList<>();
 
-            for (int component = 0; component < this.type.size(); component++){
-                totalData[index + component] = data[index][component];
+        for (int x = 0; x < complicatedArray.length; x++){
+            for (int y = 0; y < complicatedArray[x].length; y++){
+                list.add(complicatedArray[x][y]);
             }
         }
-        return totalData;
+
+        return list.toArray(new Number[list.size()]);
     }
 
     private Number[] readType(int typeOffset) throws GLTFParseException {
-        Number[] component = new Number[this.type.size()];
-        int bytesPerType = this.componentType.size() * this.type.size();
+        //System.out.println("readData: " + typeOffset);
 
-        for (int i = 0;i < component.length; i++){
-            int totalByteOffset = (bytesPerType * typeOffset) + (this.componentType.size() * i); //componentoffset + offset in component
-            component[i] = readComponentType(totalByteOffset);
+        int bytesPerType = this.type.size() * this.componentType.size();
+        int byteOffset = bytesPerType * typeOffset; //The type starts here
+
+        Number[] typeData = new Number[this.type.size()];
+
+        for(int index = 0; index < typeData.length; index++){
+            //System.out.println("readType: " + (byteOffset + (this.componentType.size() * index)));
+            typeData[index] = readComponentType(byteOffset + (this.componentType.size() * index));
         }
 
-        return component;
+        return typeData;
     }
 
+    //Read float, int ...
     private Number readComponentType(int byteOffset) throws GLTFParseException {
+        //System.out.println("ReadComponentType: " + byteOffset + " : " + this.data.length);
         byte[] componentTypeBytes = Arrays.copyOfRange(this.data, byteOffset, byteOffset + this.componentType.size()); //read data e.g. for a float
 
         ByteBuffer buffer = ByteBuffer.wrap(componentTypeBytes);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+        if (this.componentType != GLTFComponentType.FLOAT){
+            System.out.println("NOT A FLOAT BUT: " + this.componentType);
+        }
 
         try{
             switch (this.componentType) {
