@@ -11,12 +11,14 @@ import javafx.scene.Camera;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
+import javafx.scene.shape.CullFace;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.Arrays;
 
 public class MainApp extends Application {
 
@@ -36,39 +38,40 @@ public class MainApp extends Application {
         Rotate rotateY = new Rotate(0, Rotate.Y_AXIS);
         root.getTransforms().addAll(rotateX, rotateY);
 
-        root.setTranslateZ(500);
+        root.setTranslateZ(80);
+
 
         scene.setOnKeyPressed(event -> {
             switch (event.getCode()){
                 case W:
-                    root.setTranslateZ(root.getTranslateZ() - 100);
+                    root.setTranslateZ(root.getTranslateZ() - 10);
                     break;
                 case S:
-                    root.setTranslateZ(root.getTranslateZ() + 100);
+                    root.setTranslateZ(root.getTranslateZ() + 10);
                     break;
                 case A:
-                    root.setTranslateX(root.getTranslateX() - 100);
+                    root.setTranslateX(root.getTranslateX() - 10);
                     break;
                 case D:
-                    root.setTranslateX(root.getTranslateX() + 100);
+                    root.setTranslateX(root.getTranslateX() + 10);
                     break;
                 case Q:
-                    root.setTranslateY(root.getTranslateY() - 100);
+                    root.setTranslateY(root.getTranslateY() - 10);
                     break;
                 case E:
-                    root.setTranslateY(root.getTranslateY() + 100);
+                    root.setTranslateY(root.getTranslateY() + 10);
                     break;
                 case UP:
-                    rotateX.setAngle(rotateX.getAngle() + 20);
+                    rotateX.setAngle(rotateX.getAngle() + 10);
                     break;
                 case DOWN:
-                    rotateX.setAngle(rotateX.getAngle() - 20);
+                    rotateX.setAngle(rotateX.getAngle() - 10);
                     break;
                 case LEFT:
-                    rotateY.setAngle(rotateY.getAngle() + 20);
+                    rotateY.setAngle(rotateY.getAngle() + 10);
                     break;
                 case RIGHT:
-                    rotateY.setAngle(rotateY.getAngle() - 20);
+                    rotateY.setAngle(rotateY.getAngle() - 10);
                     break;
             }
         });
@@ -82,24 +85,30 @@ public class MainApp extends Application {
     }
 
     private TriangleMesh fromPrimitive(GLTFMeshPrimitive primitive) throws GLTFParseException {
+
         TriangleMesh mesh = new TriangleMesh();
         mesh.getTexCoords().addAll(0,0);
 
-        float[] vertices = primitive.getAttribute().getPosition().readDataAsFloats();
-        int numOfFaces = vertices.length / 3;
+        float[] data = primitive.getAttribute().getPosition().readDataAsFloats(); //All data NOT Vertices
+        float[][] vertices = new float[data.length / 3][3]; //actually vertices
 
-
-        for (int i = 0;i < numOfFaces;i += 3){
-            mesh.getPoints().addAll(vertices[i], vertices[i+1], vertices[i+2]);
-            mesh.getFaces().addAll(i,0, i+1,0, i+2,0);
+        for (int i = 0;i < vertices.length; i++){
+            int dataOffset = i * 3;
+            vertices[i] = new float[]{data[dataOffset], data[dataOffset+1], data[dataOffset+2]};
         }
 
+        for (int i = 0;i < vertices.length; i+=3){
+            mesh.getPoints().addAll(vertices[i]);
+            mesh.getPoints().addAll(vertices[i+1]);
+            mesh.getPoints().addAll(vertices[i+2]);
+            //add 3 points
+
+            mesh.getFaces().addAll(i,0,  i+1,0,  i+2,0 ); //Add those three points as face
+        }
         return mesh;
     }
 
     private TriangleMesh[] fromGLTFMesh(GLTFMesh gltfMesh) throws GLTFParseException {
-
-        System.out.println(gltfMesh.getPrimitives().length);
 
         TriangleMesh[] meshes = new TriangleMesh[gltfMesh.getPrimitives().length];
 
@@ -126,11 +135,11 @@ public class MainApp extends Application {
         TriangleMesh mesh = new TriangleMesh();
 
         mesh.getPoints().addAll(
-                -10f,   0f, -10f,
-                -10f,   0f,  10f,
-                 10f,   0f,  10f,
-                 10f,   0f, -10f,
-                 0f ,  10f,   0f
+                -10f,   0f, -10f, //0
+                -10f,   0f,  10f, //1
+                 10f,   0f,  10f, //2
+                 10f,   0f, -10f, //3
+                 0f ,  10f,   0f  //4
         );
 
         mesh.getFaces().addAll(
