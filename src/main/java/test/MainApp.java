@@ -1,7 +1,6 @@
 package test;
 
-import fx.FXGLTFAsset;
-import fx.FXGLTFMesh;
+import fx.FXglTFAsset;
 import gltf.GLTFAsset;
 import gltf.GLTFParseException;
 import gltf.mesh.GLTFMesh;
@@ -11,14 +10,12 @@ import javafx.scene.Camera;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
-import javafx.scene.shape.CullFace;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.util.Arrays;
 
 public class MainApp extends Application {
 
@@ -29,7 +26,7 @@ public class MainApp extends Application {
         GLTFAsset asset = new GLTFAsset(file.toURI());
 
         //Group root = test();
-        Group root = fromGLTFMeshes(asset.getMeshes()[0]);
+        Group root = FXglTFAsset.fromGLTFAsset(asset);
         Scene scene = new Scene(root);
         Camera camera = new PerspectiveCamera(true);
         camera.setFarClip(10000);
