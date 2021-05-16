@@ -62,4 +62,14 @@ public class GLTFTextureInfo {
                 extras
         );
     }
+
+    @Override
+    public String toString() {
+        return "GLTFTextureInfo{" +
+                "texture=" + texture +
+                ", texCoordIndex=" + texCoordIndex +
+                ", extensions=" + extensions +
+                ", extras=" + extras +
+                '}';
+    }
 }

@@ -45,8 +45,8 @@ public class GLTFTexture {
         JSONObject extensions = null;
         JSONObject extras = null;
 
-        if (obj.has("image")){
-            image = images[obj.getInt("image")];
+        if (obj.has("source")){
+            image = images[obj.getInt("source")];
         }
         if (obj.has("sampler")){
             sampler = samplers[obj.getInt("sampler")];
@@ -68,5 +68,16 @@ public class GLTFTexture {
                 extensions,
                 extras
         );
+    }
+
+    @Override
+    public String toString() {
+        return "GLTFTexture{" +
+                "sampler=" + sampler +
+                ", image=" + image +
+                ", name='" + name + '\'' +
+                ", extensions=" + extensions +
+                ", extras=" + extras +
+                '}';
     }
 }

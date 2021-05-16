@@ -4,6 +4,8 @@ import gltf.GLTFParseException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Arrays;
+
 public class GLTFPbrMetallicRoughness {
 
     private final float[] baseColorFactor;
@@ -110,5 +112,18 @@ public class GLTFPbrMetallicRoughness {
                 extensions,
                 extras
         );
+    }
+
+    @Override
+    public String toString() {
+        return "GLTFPbrMetallicRoughness{" +
+                "baseColorFactor=" + Arrays.toString(baseColorFactor) +
+                ", baseColorTexture=" + baseColorTexture +
+                ", metallicFactor=" + metallicFactor +
+                ", roughnessFactor=" + roughnessFactor +
+                ", metallicRoughnessTexture=" + metallicRoughnessTexture +
+                ", extensions=" + extensions +
+                ", extras=" + extras +
+                '}';
     }
 }

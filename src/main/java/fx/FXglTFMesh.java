@@ -12,21 +12,27 @@ public class FXglTFMesh extends Group {
     public static FXglTFMesh fromGLTFMesh(GLTFMesh mesh) throws GLTFParseException {
         FXglTFMesh fxMesh = new FXglTFMesh();
 
-        GLTFMeshPrimitive[] primitives = mesh.getPrimitives();
 
+        GLTFMeshPrimitive[] primitives = mesh.getPrimitives();
         MeshView[] meshViews = new MeshView[primitives.length];
         for (int i = 0;i < meshViews.length; i++){
             meshViews[i] = fromPrimitive(primitives[i]);
         }
 
+        FXglTFMaterial material;
+
         fxMesh.getChildren().addAll(meshViews);
         return fxMesh;
     }
 
+    //TODO implement other meshes e.g. include normals
     private static MeshView fromPrimitive(GLTFMeshPrimitive primitive) throws GLTFParseException {
         TriangleMesh mesh = new TriangleMesh();
+        MeshView view = new MeshView(mesh);
+
         mesh.getTexCoords().addAll(0,0);
 
+        //Parse the vertices and faces
         float[] data = primitive.getAttribute().getPosition().readDataAsFloats(); //All data NOT Vertices
         float[][] vertices = new float[data.length / 3][3]; //actually vertices
 
@@ -43,6 +49,10 @@ public class FXglTFMesh extends Group {
 
             mesh.getFaces().addAll(i,0,  i+1,0,  i+2,0 ); //Add those three points as face
         }
-        return new MeshView(mesh);
+
+        //Material
+        FXglTFMaterial material = FXglTFMaterial.fromGLTFMaterial(primitive.getMaterial());
+        view.setMaterial(material);
+        return view;
     }
 }
