@@ -7,6 +7,8 @@ import javafx.scene.Group;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
+import java.util.Arrays;
+
 public class FXglTFMesh extends Group {
 
     public static FXglTFMesh fromGLTFMesh(GLTFMesh mesh) throws GLTFParseException {
@@ -30,16 +32,13 @@ public class FXglTFMesh extends Group {
         TriangleMesh mesh = new TriangleMesh();
         MeshView view = new MeshView(mesh);
 
-        mesh.getTexCoords().addAll(0,0);
+        //Reading texture coords
+        float[][] texCoords = convertArrayToNested(2, primitive.getAttribute().getTexCoord_0().readDataAsFloats());
+        System.out.println(texCoords.length);
+        mesh.getTexCoords().addAll(primitive.getAttribute().getTexCoord_0().readDataAsFloats());
 
         //Parse the vertices and faces
-        float[] data = primitive.getAttribute().getPosition().readDataAsFloats(); //All data NOT Vertices
-        float[][] vertices = new float[data.length / 3][3]; //actually vertices
-
-        for (int i = 0;i < vertices.length; i++){
-            int dataOffset = i * 3;
-            vertices[i] = new float[]{data[dataOffset], data[dataOffset+1], data[dataOffset+2]};
-        }
+        float[][] vertices = convertArrayToNested(3, primitive.getAttribute().getPosition().readDataAsFloats());
 
         for (int i = 0;i < vertices.length; i+=3){
             mesh.getPoints().addAll(vertices[i]);
@@ -47,12 +46,23 @@ public class FXglTFMesh extends Group {
             mesh.getPoints().addAll(vertices[i+2]);
             //add 3 points
 
-            mesh.getFaces().addAll(i,0,  i+1,0,  i+2,0 ); //Add those three points as face
+            mesh.getFaces().addAll(i,i,  i+1,i+1,  i+2,i+2 ); //Add those three points as face
         }
 
         //Material
         FXglTFMaterial material = FXglTFMaterial.fromGLTFMaterial(primitive.getMaterial());
         view.setMaterial(material);
         return view;
+    }
+
+    private static float[][] convertArrayToNested(int factor, float[] array){
+        float[][] floats = new float[array.length / factor][];
+
+        for (int i = 0;i < floats.length; i++){
+            int dataOffset = i * factor;
+            floats[i] = Arrays.copyOfRange(array, dataOffset, dataOffset+factor);
+        }
+
+        return floats;
     }
 }
