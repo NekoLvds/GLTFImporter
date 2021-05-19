@@ -34,7 +34,6 @@ public class FXglTFMesh extends Group {
 
         //Reading texture coords
         float[][] texCoords = convertArrayToNested(2, primitive.getAttribute().getTexCoord_0().readDataAsFloats());
-        System.out.println(texCoords.length);
         mesh.getTexCoords().addAll(primitive.getAttribute().getTexCoord_0().readDataAsFloats());
 
         //Parse the vertices and faces
