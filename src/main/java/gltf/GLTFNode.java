@@ -7,6 +7,8 @@ import org.json.JSONObject;
 
 public class GLTFNode {
 
+    private final int index;
+
     private final GLTFCamera camera;
     private final GLTFNode[] children;
     private final int[] childIndices;
@@ -21,7 +23,9 @@ public class GLTFNode {
     private final JSONObject extensions;
     private final JSONObject extras;
 
-    public GLTFNode(GLTFCamera camera, int[] childIndices, GLTFSkin skin, float[] matrix, GLTFMesh mesh, float[] rotation, float[] scale, float[] translation, float[] weights, String name, JSONObject extensions, JSONObject extras) {
+    public GLTFNode(int index, GLTFCamera camera, int[] childIndices, GLTFSkin skin, float[] matrix, GLTFMesh mesh, float[] rotation, float[] scale, float[] translation, float[] weights, String name, JSONObject extensions, JSONObject extras) {
+        this.index = index;
+
         this.camera = camera;
         this.childIndices = childIndices;
         this.skin = skin;
@@ -100,7 +104,7 @@ public class GLTFNode {
 
     }
 
-    public static GLTFNode fromJSONObject(JSONObject obj, GLTFCamera[] cameras, GLTFMesh[] meshes, GLTFSkin[] skins){
+    public static GLTFNode fromJSONObject(int index, JSONObject obj, GLTFCamera[] cameras, GLTFMesh[] meshes, GLTFSkin[] skins){
         GLTFCamera camera = null;
         int[] children = null;
         GLTFSkin skin = null;
@@ -197,6 +201,7 @@ public class GLTFNode {
         }
 
         return new GLTFNode(
+                index,
                 camera,
                 children,
                 skin,

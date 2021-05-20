@@ -174,7 +174,7 @@ public class GLTFAsset {
         JSONArray jsonNodes = jsonAsset.getJSONArray("nodes");
         this.nodes = new GLTFNode[jsonNodes.length()];
         for (int i = 0;i < jsonNodes.length(); i++){
-            this.nodes[i] = GLTFNode.fromJSONObject(jsonNodes.getJSONObject(i), this.cameras, this.meshes, this.skins);
+            this.nodes[i] = GLTFNode.fromJSONObject(i, jsonNodes.getJSONObject(i), this.cameras, this.meshes, this.skins);
         }
 
         //Creating the animations
