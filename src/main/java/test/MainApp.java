@@ -219,23 +219,40 @@ public class MainApp extends Application {
 
         Label fpsLabel = new Label("fps: ");
         Label fpsValue = new Label();
-        AnimationTimer timer = new AnimationTimer() {
+        VBox fpsBox = new VBox(fpsLabel, fpsValue);
+
+
+        GridPane memoryPane = new GridPane();
+        memoryPane.setHgap(10);
+
+        Label totalMemLabel = new Label();
+        totalMemLabel.setText(Long.toString(Runtime.getRuntime().maxMemory() / (1024 * 1024)) + " MB");
+        memoryPane.addColumn(0, new Label("TotalMem: "), totalMemLabel);
+
+        Label usedMemBytesLabel = new Label();
+        memoryPane.addColumn(1, new Label("Used bytes: "), usedMemBytesLabel);
+
+
+        long totalMem = Runtime.getRuntime().totalMemory();
+        long oneSecondAsNano = 1000000000;
+        AnimationTimer updater = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 fpsValue.setText(String.format("%.3f",tracker.getAverageFPS()));
 
-                long oneSecondAsNano = 1000000000;
-                if ((now - timestamp) > oneSecondAsNano * 10){
+                long usedMem = totalMem - Runtime.getRuntime().freeMemory();
+
+                usedMemBytesLabel.setText(Long.toString(usedMem / (1024 * 1024)) + " MB");
+
+                if ((now - timestamp) > oneSecondAsNano * 2){
                     timestamp = now;
                     tracker.resetAverageFPS();
                 }
             }
         };
-        timer.start();
-        VBox fpsBox = new VBox(fpsLabel, fpsValue);
+        updater.start();
 
-
-        HBox labelsBox = new HBox(xRotBox, yRotBox, transXBox, transYBox, transZBox, fpsBox);
+        HBox labelsBox = new HBox(xRotBox, yRotBox, transXBox, transYBox, transZBox, fpsBox, memoryPane);
         labelsBox.setSpacing(10);
 
         hBox.getChildren().addAll(comboBox, screenshotButton, labelsBox);

@@ -44,7 +44,6 @@ public class FXglTFMesh extends Group {
             mesh.getPoints().addAll(vertices[i+1]);
             mesh.getPoints().addAll(vertices[i+2]);
             //add 3 points
-
             mesh.getFaces().addAll(i,i,  i+1,i+1,  i+2,i+2 ); //Add those three points as face
         }
 

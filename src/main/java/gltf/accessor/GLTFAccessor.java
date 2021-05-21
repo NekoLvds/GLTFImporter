@@ -173,9 +173,6 @@ public class GLTFAccessor {
         ByteBuffer buffer = ByteBuffer.wrap(componentTypeBytes);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
 
-        if (this.componentType != GLTFComponentType.FLOAT){
-            System.out.println("NOT A FLOAT BUT: " + this.componentType);
-        }
 
         try{
             switch (this.componentType) {
