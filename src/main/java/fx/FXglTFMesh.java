@@ -36,17 +36,28 @@ public class FXglTFMesh extends Group {
         float[][] texCoords = convertArrayToNested(2, primitive.getAttribute().getTexCoord_0().readDataAsFloats());
         mesh.getTexCoords().addAll(primitive.getAttribute().getTexCoord_0().readDataAsFloats());
 
-        //Parse the vertices and faces
-        float[][] vertices = convertArrayToNested(3, primitive.getAttribute().getPosition().readDataAsFloats());
+        if (primitive.getIndices() != null){
+            //Mesh is indexed
+            mesh.getPoints().addAll(primitive.getAttribute().getPosition().readDataAsFloats());
 
-        for (int i = 0;i < vertices.length; i+=3){
-            mesh.getPoints().addAll(vertices[i]);
-            mesh.getPoints().addAll(vertices[i+1]);
-            mesh.getPoints().addAll(vertices[i+2]);
-            //add 3 points
-            mesh.getFaces().addAll(i,i,  i+1,i+1,  i+2,i+2 ); //Add those three points as face
+            int[] indices = primitive.getIndices().readDataAsInts();
+
+            for (int i = 0;i < indices.length; i+=3){
+                mesh.getFaces().addAll(indices[i], 0, indices[i+1], 0, indices[i+2], 0);
+            }
+        } else {
+            //Mesh is not indexed
+            //Parse the vertices and faces
+            float[][] vertices = convertArrayToNested(3, primitive.getAttribute().getPosition().readDataAsFloats());
+
+            for (int i = 0;i < vertices.length; i+=3){
+                mesh.getPoints().addAll(vertices[i]);
+                mesh.getPoints().addAll(vertices[i+1]);
+                mesh.getPoints().addAll(vertices[i+2]);
+                //add 3 points
+                mesh.getFaces().addAll(i,i,  i+1,i+1,  i+2,i+2 ); //Add those three points as face
+            }
         }
-
         //Material
         FXglTFMaterial material = FXglTFMaterial.fromGLTFMaterial(primitive.getMaterial());
         view.setMaterial(material);

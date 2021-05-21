@@ -9,15 +9,12 @@ import jdk.jshell.spi.ExecutionControl;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import javax.sound.sampled.LineEvent;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 /**
  * The GLTFAccessor accesses data through a {@link GLTFBufferView} in a specific way. For example reading the data as three dimensional vectors
@@ -107,10 +104,24 @@ public class GLTFAccessor {
     }
 
     public float[] readDataAsFloats() throws GLTFParseException {
-        return convert(readData());
+        return convertToFloats(readData());
     }
 
-    private float[] convert(Number[] numbers){
+    public int[] readDataAsInts() throws GLTFParseException {
+        return convertToInts(readData());
+    }
+
+    private int[] convertToInts(Number[] numbers){
+        int[] retArray = new int[numbers.length];
+
+        for (int i = 0;i < retArray.length; i++){
+            retArray[i] = numbers[i].intValue();
+        }
+
+        return retArray;
+    }
+
+    private float[] convertToFloats(Number[] numbers){
         float[] retArray = new float[numbers.length];
 
         for (int i = 0;i < retArray.length; i++){

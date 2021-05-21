@@ -34,10 +34,9 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MainApp extends Application {
 
@@ -52,10 +51,13 @@ public class MainApp extends Application {
     public static float DEFAULT_TRANS_Y = 40;
     public static float DEFAULT_TRANS_Z = 320;
 
+    public Map<String, Map<String, Float>> defaults;
+
     private long timestamp = 0;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        initDefaults();
         Scene scene = this.createScene();
 
         primaryStage.setScene(scene);
@@ -63,6 +65,28 @@ public class MainApp extends Application {
         primaryStage.setWidth(getWidth());
 
         primaryStage.show();
+    }
+
+    private void initDefaults(){
+        defaults = new HashMap<>();
+        //rotx, roty, transx,y,z, scale
+        defaults.put("Fox.gltf", Stream.of(new Object[][]{
+                {"rotX"     , 200f},
+                {"rotY"     , 20f},
+                {"transX"   , 0f},
+                {"transY"   , 40f},
+                {"transZ"   , 320f},
+                {"scale"    , 1f}
+        }).collect(Collectors.toMap(data -> (String)data[0], data -> (Float)data[1])));
+
+        defaults.put("FlightHelmet.gltf", Stream.of(new Object[][]{
+                {"rotX"     , -180f},
+                {"rotY"     , 0f},
+                {"transX"   , 0f},
+                {"transY"   , 40f},
+                {"transZ"   , 200f},
+                {"scale"    , 100f}
+        }).collect(Collectors.toMap(data -> (String)data[0], data -> (Float)data[1])));
     }
 
     private Scene createScene(){
@@ -80,14 +104,15 @@ public class MainApp extends Application {
         Translate translate = new Translate();
         Rotate rotateX = new Rotate(0, Rotate.X_AXIS);
         Rotate rotateY = new Rotate(0, Rotate.Y_AXIS);
+        Scale scale = new Scale();
 
         Group root3d = new Group();
         SubScene scene3d = new SubScene(root3d, getWidth(), getHeight());
 
-        Group root2d = create2dElement(root3d, translate, rotateX, rotateY, scene3d, tracker);
+        Group root2d = create2dElement(root3d, translate, rotateX, rotateY, scale, scene3d, tracker);
         SubScene scene2d = new SubScene(root2d, getWidth(), getHeight());
 
-        root3d.getTransforms().addAll(translate, rotateX, rotateY);
+        root3d.getTransforms().addAll(translate, rotateX, rotateY, scale);
 
         sceneRoot.getChildren().addAll(scene3d, scene2d);
 
@@ -133,7 +158,7 @@ public class MainApp extends Application {
         return scene;
     }
 
-    private Group create2dElement(Group ref3d, Translate translate, Rotate rotateX, Rotate rotateY, SubScene snapshotTarget, PerformanceTracker tracker){
+    private Group create2dElement(Group ref3d, Translate translate, Rotate rotateX, Rotate rotateY, Scale scale, SubScene snapshotTarget, PerformanceTracker tracker){
         HBox hBox = new HBox();
         hBox.setSpacing(10);
         hBox.setPadding(new Insets(20,10,10,10));
@@ -141,16 +166,29 @@ public class MainApp extends Application {
         Map<String, URI> data = gltfAssetMap();
         ComboBox<String> comboBox = new ComboBox<>();
         comboBox.getItems().addAll(data.keySet());
+        comboBox.getItems().sort(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.compareTo(o2);
+            }
+        });
         comboBox.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                translate.setX(DEFAULT_TRANS_X);
-                translate.setY(DEFAULT_TRANS_Y);
-                translate.setZ(DEFAULT_TRANS_Z);
+                //todo
+                Map<String, Float> values = defaults.get(comboBox.getSelectionModel().getSelectedItem());
+                if (values != null){
+                    translate.setX(values.get("transX"));
+                    translate.setY(values.get("transY"));
+                    translate.setZ(values.get("transZ"));
 
-                rotateX.setAngle(DEFAULT_ROT_X);
-                rotateY.setAngle(DEFAULT_ROT_Y);
+                    rotateX.setAngle(values.get("rotX"));
+                    rotateY.setAngle(values.get("rotY"));
 
+                    scale.setX(values.get("scale"));
+                    scale.setY(values.get("scale"));
+                    scale.setZ(values.get("scale"));
+                }
                 ref3d.getChildren().clear();
 
                 Exception exception = null;
