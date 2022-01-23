@@ -17,12 +17,13 @@ import javafx.stage.Stage;
 
 import java.io.File;
 
+
 public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         File file = new File(
-                "C:\\Users\\Lucas\\IdeaProjects\\GLTFImporter\\src\\main\\resources\\glTF-Sample-Models\\2.0\\Fox\\glTF\\Fox.gltf");
+                "C:\\Users\\Scarl\\IdeaProjects\\GLTFImporter\\src\\main\\ressources\\glTF-Sample-Models\\2.0\\Fox\\glTF\\Fox.gltf");
         GLTFAsset asset = new GLTFAsset(file.toURI());
 
         //Group root = test();
