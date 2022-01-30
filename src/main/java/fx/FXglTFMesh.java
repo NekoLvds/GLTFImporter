@@ -3,6 +3,7 @@ package fx;
 import gltf.GLTFParseException;
 import gltf.mesh.GLTFMesh;
 import gltf.mesh.GLTFMeshPrimitive;
+import javafx.scene.DepthTest;
 import javafx.scene.Group;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
@@ -31,6 +32,7 @@ public class FXglTFMesh extends Group {
     private static MeshView fromPrimitive(GLTFMeshPrimitive primitive) throws GLTFParseException {
         TriangleMesh mesh = new TriangleMesh();
         MeshView view = new MeshView(mesh);
+        view.setDepthTest(DepthTest.ENABLE);
 
         //Reading texture coords
         float[][] texCoords = convertArrayToNested(2, primitive.getAttribute().getTexCoord_0().readDataAsFloats());

@@ -22,6 +22,7 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import jdk.jshell.spi.ExecutionControl;
 
@@ -92,12 +93,18 @@ public class MainApp extends Application {
     private Scene createScene(){
 
         Camera cam3d = new PerspectiveCamera(true);
-        cam3d.setFarClip(10000);
 
         Camera cam2d = new PerspectiveCamera();
 
         StackPane sceneRoot = new StackPane();
-        Scene scene = new Scene(sceneRoot);
+
+        Scene scene = new Scene(
+                sceneRoot,
+                Screen.getPrimary().getBounds().getWidth(),
+                Screen.getPrimary().getBounds().getHeight(),
+                true,
+                SceneAntialiasing.BALANCED
+                );
 
         PerformanceTracker tracker = PerformanceTracker.getSceneTracker(scene);
 
@@ -108,6 +115,7 @@ public class MainApp extends Application {
 
         Group root3d = new Group();
         SubScene scene3d = new SubScene(root3d, getWidth(), getHeight());
+        scene3d.setDepthTest(DepthTest.ENABLE);
 
         Group root2d = create2dElement(root3d, translate, rotateX, rotateY, scale, scene3d, tracker);
         SubScene scene2d = new SubScene(root2d, getWidth(), getHeight());
@@ -311,7 +319,10 @@ public class MainApp extends Application {
     }
 
     private List<URI> gltfAssetList(){
-        File baseUri = new File("C:\\Users\\Lucas\\IdeaProjects\\GLTFImporter\\src\\main\\resources\\glTF-Sample-Models\\2.0\\");
+        File baseUri = new File(System.getenv("APPDATA") + "\\gltfSamples\\");
+
+        System.out.println(baseUri);
+        System.out.println(baseUri.isDirectory());
 
         List<URI> uris = new LinkedList<>();
 
@@ -324,8 +335,10 @@ public class MainApp extends Application {
             });
 
             for(String s : assetDirs){
+                System.out.println(s);
                 File file = new File(s);
                 s += "\\glTF\\" + file.getName() + ".gltf";
+                System.out.println(s);
                 String endFile = baseUri.getPath() + "\\" + s;
                 uris.add(new File(endFile).toURI());
             }
